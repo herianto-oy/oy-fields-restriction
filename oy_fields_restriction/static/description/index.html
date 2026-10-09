@@ -1,0 +1,115 @@
+<section class="container" style="font-family:'Segoe UI',Arial,sans-serif; color:#2c2535; padding-top:16px; padding-bottom:24px;">
+    <div class="mb-4" style="background-color:#875a7b; color:#ffffff; border-radius:16px; padding:36px 24px; text-align:center;">
+        <h1 style="font-size:38px; font-weight:700; color:#ffffff; letter-spacing:-0.5px; margin:0 0 10px;">Fields Restriction</h1>
+        <p style="font-size:19px; line-height:1.5; color:#f3e9f0; max-width:640px; margin:0 auto 22px;">Choose the fields available to everyone, specific groups or individual users.</p>
+        <div>
+            <span style="display:inline-block; background-color:#1ad3bb; border:1px solid #1ad3bb; color:#0b3b36; border-radius:999px; padding:6px 16px; margin:4px; font-size:14px; font-weight:600;">Export &amp; Import</span>
+            <span style="display:inline-block; background-color:#9d7593; border:1px solid rgba(255,255,255,0.35); color:#ffffff; border-radius:999px; padding:6px 16px; margin:4px; font-size:14px; font-weight:600;">Filters</span>
+            <span style="display:inline-block; background-color:#9d7593; border:1px solid rgba(255,255,255,0.35); color:#ffffff; border-radius:999px; padding:6px 16px; margin:4px; font-size:14px; font-weight:600;">Group By</span>
+        </div>
+    </div>
+
+    <p class="mb-4" style="color:#6b6375;">Manage Export and Import with one shared field policy. Configure Filters and Group By separately. Apply rules by model to everyone, a group or selected users, with optional Menu and Action settings.</p>
+
+    <div class="mb-4">
+        <h2 style="font-size:23px; color:#714b67;">Features</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th scope="col">Operation</th><th scope="col">What is controlled</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Export &amp; Import</th>
+                        <td>
+                            <p class="mb-2">Choose which fields users can <strong>export and import</strong>. Restricted fields are hidden from export field choices and import mappings. The same policy applies to saved templates, CSV/XLSX downloads and checks before Test or Import.</p>
+                            <p class="mb-0" style="color:#6b6375;"><strong>Example:</strong> For Sales Orders, allow only Order Reference and Salesperson. Users can export and map those fields, while Customer is unavailable for both operations.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Filters</th>
+                        <td>
+                            <p class="mb-2">Choose which fields users can <strong>filter records by</strong>. Restricted fields are hidden from <strong>Add Custom Filter</strong>. Built-in filters, date filters and favorites that use those fields are also hidden. Allowed default filters stay active.</p>
+                            <p class="mb-0" style="color:#6b6375;"><strong>Example:</strong> For Sales Orders, allow only Order Reference and Salesperson. Users can filter by those fields, while filters using Status or Creation Date are hidden. My Quotations remains available in the standard view.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Group By</th>
+                        <td>
+                            <p class="mb-2">Choose which fields users can <strong>group records by</strong>. Restricted fields are hidden from <strong>Add Custom Group</strong>. Predefined Group By options that use those fields are also hidden. This policy is independent of Filters.</p>
+                            <p class="mb-0" style="color:#6b6375;"><strong>Example:</strong> For Sales Orders, allow only Customer. Users can group by Customer, while grouping by Salesperson or Order Date is unavailable.</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="mb-0" style="color:#6b6375;">Supports standard and custom fields. Field selectors show labels and technical names, with choices filtered by the operation they support.</p>
+    </div>
+
+    <div class="mb-4">
+        <h2 style="font-size:23px; color:#714b67;">Set up your first rule</h2>
+        <!-- Insert an actual Odoo form screenshot here when available. -->
+        <ol style="padding-left:22px;">
+            <li class="mb-2"><strong>Open the configuration.</strong> As a Settings administrator, enable developer mode and go to <strong>Settings &gt; Technical &gt; Database Structure &gt; Fields Restriction Rules</strong>. Click New.</li>
+            <li class="mb-2"><strong>Name the rule and select a Model.</strong> Menu and Action are optional. Selecting a Menu fills its Action and limits the choices. With Menu empty, all actions for the model are available. Leave both empty for a model-wide rule.</li>
+            <li class="mb-2"><strong>Choose Apply To and Priority.</strong> Select Global, Group or User, then choose the targets when needed. The defaults are Global and Priority 1. Set Priority manually to resolve conflicting field rules.</li>
+            <li><strong>Select policies and fields.</strong> Configure the Export / Import, Filters and Group By tabs. Save and reload the target user's browser. Export and Import share one policy and field list.</li>
+        </ol>
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th scope="col">Policy</th><th scope="col">Behavior</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row">No restriction</th><td>Adds no field decisions. Other matching rules still apply.</td></tr>
+                    <tr><th scope="row">Only selected fields</th><td>Allows selected fields. Allowances from matching rules are combined, then conflicts are resolved per field. Unlisted fields remain hidden.</td></tr>
+                    <tr><th scope="row">Block selected fields</th><td>Blocks selected fields, subject to the per-field priority rules below.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="mb-0" style="color:#6b6375;">An empty allowlist adds no allowed fields and does not erase another rule's selections. User or Group rules with no targets do not apply to anyone.</p>
+    </div>
+
+    <div class="mb-4">
+        <h2 style="font-size:23px; color:#714b67;">Example: one model, two actions</h2>
+        <p>Use two Global rules for <strong>Sales Order</strong>, both at Priority 1, with Export / Import set to <strong>Only selected fields</strong>.</p>
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th scope="col">Action</th><th scope="col">Selected fields</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row">Quotations</th><td>Order Reference (<code>name</code>) and Salesperson (<code>user_id</code>)</td></tr>
+                    <tr><th scope="row">Sales Orders</th><td>Order Reference (<code>name</code>) and Customer (<code>partner_id</code>)</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="mb-0" style="color:#6b6375;">Each action uses its matching rule. An Action-only rule follows that action across menus. Select Menu to distinguish menus that share one action. Menu rules apply to the exact originating menu.</p>
+    </div>
+
+    <div class="mb-4">
+        <h2 style="font-size:23px; color:#714b67;">How rules combine</h2>
+        <p>All active rules matching the model, audience and optional Menu / Action are considered. Decisions are made separately for Filters, Group By and Export / Import.</p>
+        <div class="table-responsive">
+            <table class="table">
+                <thead><tr><th scope="col">Situation</th><th scope="col">Result</th></tr></thead>
+                <tbody>
+                    <tr><th scope="row">Different fields</th><td>Combine the selections, even when Priority or Apply To differs.</td></tr>
+                    <tr><th scope="row">Same field, conflicting decisions</th><td>The smaller Priority number wins.</td></tr>
+                    <tr><th scope="row">Same field and Priority</th><td>User takes precedence over Group, then Global.</td></tr>
+                    <tr><th scope="row">Same field, Priority and Apply To</th><td>A block wins over an allowance.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p><strong>Example:</strong> allowing <code>name, email</code> in one rule and <code>name, phone</code> in another makes all three fields available. If a winning rule blocks <code>email</code>, only <code>name</code> and <code>phone</code> remain.</p>
+        <p class="mb-0" style="color:#6b6375;">Priority resolves conflicts for shared fields only. Menu or Action specificity does not change that order. Archived rules are ignored.</p>
+    </div>
+
+    <div class="mb-4 pt-3 border-top">
+        <h2 style="font-size:23px; color:#714b67;">Usage notes</h2>
+        <ul class="mb-0" style="padding-left:22px; color:#6b6375;">
+            <li class="mb-2">Without a matching active rule, no rule-based field restrictions apply. Administrators follow matching rules too. Superuser mode bypasses them.</li>
+            <li class="mb-2">Odoo field capabilities still apply. Exportable read-only fields may not support import, and required fields need values or defaults. Related fields also follow their target model's rules.</li>
+            <li>This module controls field choices and web Export / Import. It does not hide form or list columns, replace access rights, or restrict direct ORM/API operations.</li>
+        </ul>
+    </div>
+
+    <div class="pt-3 border-top">
+        <h2 style="font-size:23px; color:#714b67;">Support</h2>
+        <p class="mb-0"><a href="mailto:herianto.oy@gmail.com" style="color:#117d75;">herianto.oy@gmail.com</a> &mdash; Include your Odoo version, rule settings and steps to reproduce the issue.</p>
+    </div>
+</section>

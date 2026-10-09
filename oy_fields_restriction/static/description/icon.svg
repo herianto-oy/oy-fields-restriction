@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <title>OY</title>
+  <desc>A plum O and turquoise Y on a rounded white tile with transparent corners.</desc>
+  <rect width="256" height="256" rx="56" fill="#ffffff"/>
+  <path fill="#875a7b" fill-rule="evenodd" d="M131 128a45 56 0 1 0-90 0 45 56 0 1 0 90 0ZM111 128a25 36 0 1 0-50 0 25 36 0 1 0 50 0Z"/>
+  <path d="M145 82 174 127 203 82M174 127V174" fill="none" stroke="#1ad3bb" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
