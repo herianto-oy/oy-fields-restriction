@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_field_restriction_rule_list" model="ir.ui.view">
+        <field name="name">field.restriction.rule.list</field>
+        <field name="model">field.restriction.rule</field>
+        <field name="arch" type="xml">
+            <list default_order="model_id, priority, name, id" decoration-muted="not active">
+                <field name="priority"/>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="menu_id" optional="hide"/>
+                <field name="action_id" optional="hide"/>
+                <field name="scope"/>
+                <field name="user_ids" widget="many2many_tags" optional="hide"/>
+                <field name="group_ids" widget="many2many_tags" optional="hide"/>
+                <field name="search_mode" optional="hide"/>
+                <field name="group_by_mode" optional="hide"/>
+                <field name="export_mode" optional="hide"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_field_restriction_rule_form" model="ir.ui.view">
+        <field name="name">field.restriction.rule.form</field>
+        <field name="model">field.restriction.rule</field>
+        <field name="arch" type="xml">
+            <form string="Fields Restriction Rules">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title"><h1><field name="name" placeholder="e.g. Sales field restrictions"/></h1></div>
+                    <group name="rule_configuration">
+                        <group name="model_view" string="Model / View">
+                            <field name="active" invisible="1"/>
+                            <field name="model_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="model_name"/>
+                            <field name="available_menu_ids" invisible="1"/>
+                            <field name="available_action_ids" invisible="1"/>
+                            <field name="menu_id" domain="[('id', 'in', available_menu_ids)]" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="action_id" domain="[('res_model', '=', model_name), ('id', 'in', available_action_ids)]" options="{'no_create': True, 'no_open': True}"/>
+                            <div class="text-muted" colspan="2">Menu and Action are optional. Selecting a menu fills its action and limits the Action choices to that menu. With Menu empty, all actions for the selected model are available. Leave both empty to apply across all views of this model.</div>
+                        </group>
+                        <group name="rule_settings" string="Rule Settings">
+                            <field name="scope" widget="radio" options="{'horizontal': True}"/>
+                            <field name="user_ids" widget="many2many_tags" domain="[('share', '=', False)]" options="{'no_create': True}" invisible="scope != 'user'"/>
+                            <field name="group_ids" widget="many2many_tags" options="{'no_create': True}" invisible="scope != 'group'"/>
+                            <field name="priority"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-warning" role="status" invisible="scope == 'global' or (scope == 'user' and user_ids) or (scope == 'group' and group_ids)">
+                        Select users or groups to apply this rule. You can save it now;
+                        it will not apply to anyone until a target is selected.
+                    </div>
+                    <field name="notes" placeholder="Configuration notes..."/>
+                    <notebook>
+                        <page name="export_import" string="Export / Import">
+                            <group>
+                                <field name="export_mode"/>
+                            </group>
+                            <p class="text-muted">External ID and Database ID are available for Import and import-compatible Export without configuration. They cannot be blocked by a rule and are hidden in regular Export.</p>
+                            <p class="text-muted">Choose fields that support Export or Import. A field available for export may still be read-only for import.</p>
+                            <field name="available_export_field_ids" invisible="1"/>
+                            <field name="export_field_ids" widget="one2many" nolabel="1" domain="[('model_id', '=', model_id), ('id', 'in', available_export_field_ids)]" invisible="export_mode == 'none'" options="{'no_create': True, 'no_create_edit': True, 'create': False, 'createEdit': False}">
+                                <list create="false" edit="false">
+                                    <field name="field_description" string="Name" readonly="1"/>
+                                    <field name="name" string="Technical Name" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="search_filters" string="Filters">
+                            <group>
+                                <field name="search_mode"/>
+                            </group>
+                            <p class="text-muted">Only searchable fields supported by the filter selector are available.</p>
+                            <field name="available_search_field_ids" invisible="1"/>
+                            <field name="search_field_ids" widget="one2many" nolabel="1" domain="[('model_id', '=', model_id), ('id', 'in', available_search_field_ids)]" invisible="search_mode == 'none'" options="{'no_create': True, 'no_create_edit': True, 'create': False, 'createEdit': False}">
+                                <list create="false" edit="false">
+                                    <field name="field_description" string="Name" readonly="1"/>
+                                    <field name="name" string="Technical Name" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page name="group_by" string="Group By">
+                            <group>
+                                <field name="group_by_mode"/>
+                            </group>
+                            <p class="text-muted">Only supported groupable fields and dynamic property containers are available.</p>
+                            <field name="available_group_by_field_ids" invisible="1"/>
+                            <field name="group_by_field_ids" widget="one2many" nolabel="1" domain="[('model_id', '=', model_id), ('id', 'in', available_group_by_field_ids)]" invisible="group_by_mode == 'none'" options="{'no_create': True, 'no_create_edit': True, 'create': False, 'createEdit': False}">
+                                <list create="false" edit="false">
+                                    <field name="field_description" string="Name" readonly="1"/>
+                                    <field name="name" string="Technical Name" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    <div name="rule_combination_note" class="border rounded mt-4 mb-3" role="note">
+                        <div class="bg-light border-bottom p-3">
+                            <h5 class="mb-1">Configuration guide</h5>
+                            <p class="mb-0 text-muted">Priority resolves conflicts for the same field: <strong>1 overrides 2.</strong> Different fields are combined.</p>
+                        </div>
+                        <div class="p-3">
+                            <div class="row g-4 mb-4">
+                                <div class="col-12 col-lg-6">
+                                    <h6 class="fw-bold mb-2">Priority</h6>
+                                    <ul class="ps-3 mb-0">
+                                        <li class="mb-2">New rules default to Priority 1. Set the number manually to control which rules take precedence.</li>
+                                        <li class="mb-2">Archived rules do not apply.</li>
+                                        <li class="mb-2">All active rules matching the model, user, and optional menu/action contribute their selected fields. Lower numbers win only when the same field is selected by conflicting rules.</li>
+                                        <li>Priority is not assigned sequentially and does not change when selecting a model.</li>
+                                    </ul>
+                                </div>
+                                <div class="col-12 col-lg-6">
+                                    <h6 class="fw-bold mb-2">Combining fields</h6>
+                                    <p class="text-muted mb-2">For the same field, compare Priority first, then User, Group, Global. If Priority and Apply To are equal, blocking wins. Fields selected by other rules remain included.</p>
+                                    <ul class="ps-3 mb-0">
+                                        <li class="mb-2"><strong>Only selected + Only selected:</strong> combine fields from both lists.</li>
+                                        <li class="mb-2"><strong>Only selected + Block selected:</strong> resolve each shared field by Priority and Apply To. Keep the other allowed fields.</li>
+                                        <li><strong>Block selected + Block selected:</strong> hide fields included in either block list.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold mb-2">Menu and action scope</h6>
+                            <ul class="ps-3 mb-3">
+                                <li><strong>Both empty:</strong> apply in every menu and action for the model.</li>
+                                <li><strong>Action only:</strong> apply wherever this action is opened, including menus that share it.</li>
+                                <li><strong>Menu selected:</strong> apply only to that exact menu and its window action. Parent menus and sibling menus are not included.</li>
+                                <li>Menu/action rules do not automatically override model-wide rules. Use a lower Priority number for an override.</li>
+                                <li>Without a known menu origin, only action-wide and model-wide rules apply. A menu can be inferred only when it is the sole menu for that action.</li>
+                            </ul>
+                            <div class="bg-light rounded p-3 mb-3">
+                                <strong class="d-block mb-1">Example: the same Sales Order model in two actions</strong>
+                                <p class="mb-1">Rule A: Action = Quotations, Priority = 1. Allow only <code>name</code> and <code>user_id</code> for Filters and Export / Import.</p>
+                                <p class="mb-1">Rule B: Action = Sales Orders, Priority = 1. Allow only <code>name</code> and <code>partner_id</code> for Filters and Export / Import.</p>
+                                <p class="mb-0 text-muted">Each action uses its own rule. Export and Import share one policy and field list; Filters and Group By have their own settings. If two menus share one action, select the Menu to distinguish them.</p>
+                            </div>
+                            <h6 class="fw-bold mb-1">Priority examples</h6>
+                            <p class="text-muted mb-2">Each row is a separate example of two active Filters rules for Sales Order.</p>
+                            <div class="table-responsive border rounded mb-3">
+                                <table class="table table-sm table-striped align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col" class="p-2">Rule A</th>
+                                            <th scope="col" class="p-2">Rule B</th>
+                                            <th scope="col" class="p-2">Result</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="p-2"><strong class="d-block mb-1">Global ? Priority 1</strong>Allow only <code>name</code>, <code>user_id</code>.</td>
+                                            <td class="p-2"><strong class="d-block mb-1">User: Alice ? Priority 5</strong>Allow only <code>partner_id</code>.</td>
+                                            <td class="p-2">Alice can use <code>name</code>, <code>user_id</code>, and <code>partner_id</code>.<br/><span class="text-muted">Different fields are combined regardless of Priority or Apply To.</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2"><strong class="d-block mb-1">Global · Priority 1</strong>Allow only <code>name</code>, <code>user_id</code>.</td>
+                                            <td class="p-2"><strong class="d-block mb-1">Global · Priority 2</strong>Block <code>user_id</code>.</td>
+                                            <td class="p-2">Both fields are available.<br/><span class="text-muted">The lower-priority block for user_id is ignored.</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2"><strong class="d-block mb-1">Global · Priority 1</strong>Allow only <code>name</code>, <code>user_id</code>.</td>
+                                            <td class="p-2"><strong class="d-block mb-1">Global · Priority 1</strong>Block <code>user_id</code>.</td>
+                                            <td class="p-2">Only <code>name</code> is available.<br/><span class="text-muted">Blocking wins at equal priority and Apply To.</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2"><strong class="d-block mb-1">Global · Priority 1</strong>Block <code>user_id</code>.</td>
+                                            <td class="p-2"><strong class="d-block mb-1">User: Alice · Priority 1</strong>Allow only <code>name</code>, <code>user_id</code>.</td>
+                                            <td class="p-2">Alice can use both fields.<br/><span class="text-muted">User wins over Global at the same Priority. Other users follow Rule A.</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2"><strong class="d-block mb-1">Global · Priority 1</strong>Block <code>user_id</code>.</td>
+                                            <td class="p-2"><strong class="d-block mb-1">Group: Sales · Priority 1</strong>Allow only <code>name</code>, <code>user_id</code>.</td>
+                                            <td class="p-2">Sales group members can use both fields.<br/><span class="text-muted">Group wins over Global for user_id unless a User rule selects that field at this Priority.</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="border-top pt-3">
+                                <h6 class="fw-bold mb-2">Keep in mind</h6>
+                                <ul class="ps-3 mb-3">
+                                    <li>Global applies to everyone. Group and User apply to selected targets. For the same selected field and Priority, User overrides Group, then Global.</li>
+                                    <li>Field conflicts are resolved independently for Filters, Group By, and Export / Import. Export and Import share the same policy and field list.</li>
+                                    <li>Export restricts field selection, saved templates, and downloaded columns. Import restricts column mapping and checks it again before importing.</li>
+                                    <li>External ID and Database ID are always available for Import and cannot be blocked by a rule. For Export, they appear only when "I want to update data (import-compatible export)" is checked, including with an empty allowlist. IDs of related records remain available when the relation field is allowed.</li>
+                                    <li>Related fields also follow the rules of their target model. Required fields still need a value or an Odoo default when importing new records.</li>
+                                    <li><strong>No restriction</strong> adds no field decisions. Other matching rules still apply to that operation.</li>
+                                    <li>When any matching rule uses <strong>Only selected fields</strong>, unlisted fields are hidden. An empty list adds no allowed fields and does not remove fields allowed by other rules. With no allowed fields, only transfer identifiers remain available for Import and import-compatible Export.</li>
+                                </ul>
+                                <p class="text-muted mb-0"><i class="fa fa-refresh me-1" aria-hidden="true"/>Reload the browser after changing rules or group membership.</p>
+                            </div>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_field_restriction_rule_search" model="ir.ui.view">
+        <field name="name">field.restriction.rule.search</field>
+        <field name="model">field.restriction.rule</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="menu_id"/>
+                <field name="action_id"/>
+                <field name="user_ids"/>
+                <field name="group_ids"/>
+                <field name="scope"/>
+                <filter name="scope_global" string="Global" domain="[('scope', '=', 'global')]"/>
+                <filter name="scope_group" string="Group" domain="[('scope', '=', 'group')]"/>
+                <filter name="scope_user" string="User" domain="[('scope', '=', 'user')]"/>
+                <separator/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="model" string="Model" context="{'group_by': 'model_id'}"/>
+                    <filter name="action" string="Action" context="{'group_by': 'action_id'}"/>
+                    <filter name="menu" string="Menu" context="{'group_by': 'menu_id'}"/>
+                    <filter name="scope" string="Apply To" context="{'group_by': 'scope'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_field_restriction_rule" model="ir.actions.act_window">
+        <field name="name">Fields Restriction Rules</field>
+        <field name="res_model">field.restriction.rule</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Configure the fields users can search, group by, export, and import</p></field>
+    </record>
+    <menuitem id="menu_field_restriction_rule" name="Fields Restriction Rules" parent="base.next_id_9" action="action_field_restriction_rule" groups="base.group_system" sequence="45"/>
+</odoo>
